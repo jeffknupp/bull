@@ -5,5 +5,4 @@ def get_app():
 
 if __name__ == '__main__':
     app.config.from_object('config')
-    from bull import bull
     get_app().run(debug=True)

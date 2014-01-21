@@ -5,18 +5,20 @@ trivially easy.
 """
 
 import datetime
+import logging
 import sys
 import uuid
 
 from jinja2 import Environment, PackageLoader
 from flask import (Blueprint, send_from_directory, abort, redirect, request,
-                   render_template)
+                   render_template, current_app)
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail, Message
 import stripe
 
 from .models import Product, Purchase, db
 
+logger = logging.getLogger(__name__)
 bull = Blueprint('bull', __name__)
 env = Environment(loader=PackageLoader('bull', 'templates'))
 mail = Mail()
@@ -34,7 +36,7 @@ def download_file(uuid):
         if purchase.downloads_left <= 0:
             return render_template('downloads_exceeded.html')
         db.session.commit()
-        return send_from_directory(directory=app.config['FILE_DIRECTORY'],
+        return send_from_directory(directory=current_app.config['FILE_DIRECTORY'],
                 filename=purchase.product.file_name, as_attachment=True)
     else:
         abort(404)
@@ -58,7 +60,7 @@ def buy():
     except stripe.CardError, e:
         return render_template('charge_error.html')
 
-    app.logger.info(charge)
+    current_app.logger.info(charge)
 
     purchase = Purchase(uuid=str(uuid.uuid4()),
             email=email,
@@ -71,14 +73,14 @@ def buy():
 
     message = Message(
             html=mail_html,
-            subject=app.config['MAIL_SUBJECT'],
-            sender=app.config['MAIL_FROM'],
+            subject=current_app.config['MAIL_SUBJECT'],
+            sender=current_app.config['MAIL_FROM'],
             recipients=[email])
 
     with mail.connect() as conn:
         conn.send(message)
 
-    return render_template('success.html', url=purchase.uuid)
+    return render_template('success.html', url=str(purchase.uuid))
 
 @bull.route('/test/<product_id>')
 def test(product_id):
