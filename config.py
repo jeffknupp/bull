@@ -1,5 +1,7 @@
 """Settings for bull installation."""
+from os.path import abspath, dirname, join
 
+_cwd = dirname(abspath(__file__))
 # Subject of the email sent after purchase 
 # MAIL_SUBJECT = 
 
@@ -28,7 +30,7 @@
 # SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite:///sqlite3.db'
 
 # Stripe secret key to be used to process purchases
-# STRIPE_SECRET_KEY = 
+STRIPE_SECRET_KEY = 'foo'
 
 # Stripe public key to be used to process purchases
-# STRIPE_PUBLIC_KEY = 
+STRIPE_PUBLIC_KEY = 'bar'
