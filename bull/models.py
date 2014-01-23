@@ -47,6 +47,9 @@ class Purchase(db.Model):
     downloads_left = db.Column(db.Integer, default=5)
     sold_at = db.Column(db.DateTime, default=datetime.datetime.now)
 
+    def sell_date(self):
+        return self.sold_at.date
+
     def __str__(self):
         """Return the string representation of the purchase."""
         return '{} bought by {}'.format(self.product.name, self.email)

@@ -4,14 +4,12 @@ trivially easy.
 
 """
 
-import datetime
 import logging
 import sys
 import uuid
 
-from jinja2 import Environment, PackageLoader
-from flask import (Blueprint, send_from_directory, abort, redirect, request,
-                   render_template, current_app)
+from flask import (Blueprint, send_from_directory, abort, request,
+                   render_template, current_app, render_template)
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.mail import Mail, Message
 import stripe
@@ -20,24 +18,27 @@ from .models import Product, Purchase, db
 
 logger = logging.getLogger(__name__)
 bull = Blueprint('bull', __name__)
-env = Environment(loader=PackageLoader('bull', 'templates'))
 mail = Mail()
 
-@bull.route('/<uuid>')
-def download_file(uuid):
-    """Serve the file associated with the purchase whose ID is *uuid*.
 
-    :param str uuid: Primary key of the purchase whose file we need to serve
+@bull.route('/<purchase_uuid>')
+def download_file(purchase_uuid):
+    """Serve the file associated with the purchase whose ID is *purchase_uuid*.
+
+    :param str purchase_uuid: Primary key of the purchase whose file we need
+                              to serve
 
     """
-    purchase = Purchase.query.get(uuid)
+    purchase = Purchase.query.get(purchase_uuid)
     if purchase:
         purchase.downloads_left -= 1
         if purchase.downloads_left <= 0:
             return render_template('downloads_exceeded.html')
         db.session.commit()
-        return send_from_directory(directory=current_app.config['FILE_DIRECTORY'],
-                filename=purchase.product.file_name, as_attachment=True)
+        return send_from_directory(
+                directory=current_app.config['FILE_DIRECTORY'],
+                filename=purchase.product.file_name,
+                as_attachment=True)
     else:
         abort(404)
 
@@ -57,7 +58,7 @@ def buy():
                 currency='usd',
                 card=stripe_token,
                 description=email)
-    except stripe.CardError, e:
+    except stripe.CardError:
         return render_template('charge_error.html')
 
     current_app.logger.info(charge)
@@ -68,7 +69,7 @@ def buy():
     db.session.add(purchase)
     db.session.commit()
 
-    mail_template = env.get_template('email.html')
+    mail_template = render_template('email.html')
     mail_html = mail_template.render(purchase=purchase, product=product)
 
     message = Message(
@@ -82,13 +83,37 @@ def buy():
 
     return render_template('success.html', url=str(purchase.uuid))
 
+@bull.route('/reports')
+def reports():
+    """Run and display various analytics reports."""
+    products = Product.query.all()
+    purchases = Purchase.query.all()
+    purchases = [p for p in purchases if p.email not in (
+        'jeff@jeffknupp.com', 'jknupp@gmail.com')]
+    purchases_by_day = dict()
+    for purchase in purchases:
+        purchase_date = purchase.sold_at.date().strftime('%m-%d')
+        if purchase_date not in purchases_by_day:
+            purchases_by_day[purchase_date] = {'units': 0, 'sales': 0.0}
+        purchases_by_day[purchase_date]['units'] += 1
+        purchases_by_day[purchase_date]['sales'] += purchase.product.price
+    purchase_days = sorted(purchases_by_day.keys())
+    units = len(purchases)
+    total_sales = sum([p.product.price for p in purchases])
+
+    return render_template(
+            'reports.html',
+            products=products,
+            purchase_days=purchase_days,
+            purchases=purchases,
+            purchases_by_day=purchases_by_day,
+            units=units,
+            total_sales=total_sales)
+
 @bull.route('/test/<product_id>')
 def test(product_id):
     """Return a test page for live testing the "purchase" button."""
     test_product = Product.query.get(product_id)
     return render_template(
-            'test.html', 
+            'test.html',
             test_product=test_product)
-
-if __name__ == '__main__':
-    sys.exit(app.run(debug=True))
