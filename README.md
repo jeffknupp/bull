@@ -1,4 +1,21 @@
-# `Bull` always charges...
+# `bull` always charges...
+
+## WTF is `bull`?
+
+On a Friday evening, not too long ago, I was lamenting the shortcomings of the
+various services I've used to sell my book from my website. Digital goods sales
+should be a solved problem by now, but I ran into all sorts of issues when
+trying to send updates to customers and integrate properly with Google
+Analytics.
+
+[Long story](http://www.jeffknupp.com/blog/2014/01/18/python-and-flask-are-ridiculously-powerful/) short, I 
+took two hours and wrote a replacement using Python, Flask, SQLAlchemy, and
+Stripe as the payment processor. `bull` is easy enough to set up in a few
+minutes *on your own domain*. Why does being on your domain matter? Because it
+makes Google Analytics happy and report conversions properly.
+
+The only things you need to get started using `bull` are a Stripe account (free)
+and a web server (free?).
 
 ## Quickstart
 
