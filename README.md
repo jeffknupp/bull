@@ -2,9 +2,30 @@
 
 ## Quickstart
 
-Clone the `bull` repository. Fill in the values in `config.py` (use your "test" Stripe keys for now). Create a directory
+Clone the `bull` repository (or `pip install bull`, if you do this, copy the `app.py` file from 
+the repo to whatever directory you want to run it from). Fill in the 
+values in `config.py` (use your "test" Stripe keys for now). Create a directory
 `files` and add the content you're selling there. Add product entries to your database with the 
 appropriate filename (use `scripts/populate_db` as a model).
+
+## Analytics and Login
+
+`bull` now supports simple sales analytics at the `/reports` endpoint. It
+requires authorization, which in turn requires you to create (one) user using
+the `scripts/create_user.py` script. To see the reports, hit `/login` and log
+in. You should be good to go after that, and no one else will be able to see the
+reports.
+
+**Reporting includes:**
+
+* Email addresses and sales totals of recent purchases
+* Sales data broken down by calendar day
+* Sales charts based on revenue/units sold per day
+
+## Overriding Default Templates
+
+Simply create a `templates` directory and create a file of the same name as the
+template you want to replace.
 
 ## Testing
 
