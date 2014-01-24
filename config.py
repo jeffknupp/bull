@@ -2,39 +2,35 @@
 from os.path import abspath, dirname, join
 
 _cwd = dirname(abspath(__file__))
-
-# Directory containing your products
-FILE_DIRECTORY = dirname(abspath(__file__)) + '/files'
-
 # Subject of the email sent after purchase 
-MAIL_SUBJECT = 'Thanks for the purchase'
+# MAIL_SUBJECT = 
 
 # Email address for the 'from' field of the generated email
-MAIL_FROM = 'jeff@jeffknupp.com'
+# MAIL_FROM = 
 
 # Email server address
-MAIL_SERVER = 'smtp.gmail.com'
+# MAIL_SERVER = 
 
 # Email server username
-MAIL_USERNAME = 'jeff@jeffknupp.com'
+# MAIL_USERNAME = 
 
 # Email server password
-MAIL_PASSWORD = 'lissrose3'
+# MAIL_PASSWORD = 
 
 # Email server port
-MAIL_PORT = 465
+# MAIL_PORT = 
 
 # Use SSL for email? 
-MAIL_USE_SSL = True
+# MAIL_USE_SSL = 
 
 # Website name, for use in Stripe purchases
-SITE_NAME = 'Foo.com'
+# SITE_NAME = 
 
 # Database URI for SQLAlchmey (Default: 'sqlite+pysqlite3:///sqlite3.db')
-SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite:///sqlite3.db'
+# SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite:///sqlite3.db'
 
 # Stripe secret key to be used to process purchases
-STRIPE_SECRET_KEY = 'sk_test_VXxFQI4v3Ym2EwnXh79mzDoN'
+STRIPE_SECRET_KEY = 'foo'
 
 # Stripe public key to be used to process purchases
-STRIPE_PUBLIC_KEY = 'pk_test_w3qNBkDR8A4jkKejBmsMdH34'
+STRIPE_PUBLIC_KEY = 'bar'
