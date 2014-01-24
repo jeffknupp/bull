@@ -54,4 +54,30 @@ class Purchase(db.Model):
         """Return the string representation of the purchase."""
         return '{} bought by {}'.format(self.product.name, self.email)
 
+class User(db.Model):
+    """An admin user capable of viewing reports.
 
+    :param str email: email address of user
+    :param str password: encrypted password for the user
+    """
+    __tablename__ = 'user'
+
+    def __init__(self, email, password):
+        self.email = email
+        self.password = password
+        self.is_authenticated = False
+
+    email = db.Column(db.String, primary_key=True)
+    password = db.Column(db.String)
+
+    def is_authenticated(self):
+        return self.is_authenticated
+    
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.email

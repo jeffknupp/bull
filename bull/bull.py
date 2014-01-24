@@ -9,17 +9,45 @@ import sys
 import uuid
 
 from flask import (Blueprint, send_from_directory, abort, request,
-                   render_template, current_app, render_template)
+                   render_template, current_app, render_template, redirect,
+                   url_for)
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.login import LoginManager, login_required, login_user
 from flask.ext.mail import Mail, Message
+from flask_wtf import Form
+from wtforms import TextField, PasswordField
+from wtforms.validators import DataRequired
 import stripe
 
-from .models import Product, Purchase, db
+from .models import Product, Purchase, User, db
 
 logger = logging.getLogger(__name__)
 bull = Blueprint('bull', __name__)
 mail = Mail()
+login_manager = LoginManager()
 
+
+class LoginForm(Form):
+    email = TextField('name', validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired()]) 
+
+@login_manager.user_loader
+def user_loader(user_id):
+    """Given *user_id*, return the associated User object.
+
+    :param unicode user_id: user_id (email) user to retrieve
+    """
+    return User.query.get(user_id)
+
+@bull.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.get(form.email.data)
+        login_user(user, remember=True)
+        
+        return redirect(url_for("bull.reports"))
+    return render_template("login.html", form=form)
 
 @bull.route('/<purchase_uuid>')
 def download_file(purchase_uuid):
@@ -84,12 +112,11 @@ def buy():
     return render_template('success.html', url=str(purchase.uuid))
 
 @bull.route('/reports')
+@login_required
 def reports():
     """Run and display various analytics reports."""
     products = Product.query.all()
     purchases = Purchase.query.all()
-    purchases = [p for p in purchases if p.email not in (
-        'jeff@jeffknupp.com', 'jknupp@gmail.com')]
     purchases_by_day = dict()
     for purchase in purchases:
         purchase_date = purchase.sold_at.date().strftime('%m-%d')
