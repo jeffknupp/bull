@@ -26,7 +26,6 @@ bull = Blueprint('bull', __name__)
 mail = Mail()
 login_manager = LoginManager()
 
-
 class LoginForm(Form):
     email = TextField('name', validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired()]) 
@@ -97,8 +96,10 @@ def buy():
     db.session.add(purchase)
     db.session.commit()
 
-    mail_template = render_template('email.html')
-    mail_html = mail_template.render(purchase=purchase, product=product)
+    mail_html = render_template(
+            'email.html',
+            url=purchase.uuid,
+            )
 
     message = Message(
             html=mail_html,

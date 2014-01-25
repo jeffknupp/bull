@@ -23,8 +23,8 @@ _cwd = dirname(abspath(__file__))
 # Use SSL for email? 
 # MAIL_USE_SSL = 
 
-# Website name, for use in Stripe purchases
-# SITE_NAME = 
+# Website address, for use in Stripe purchases and in email
+# SITE_ADDRESS = 
 
 # Database URI for SQLAlchmey (Default: 'sqlite+pysqlite3:///sqlite3.db')
 # SQLALCHEMY_DATABASE_URI = 'sqlite+pysqlite:///sqlite3.db'
