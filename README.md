@@ -52,11 +52,6 @@ Enter Stripe's test credit card number (4242 4242 4242 4242). You should be
 successfully directed to a "success.html" page with your download link. If your
 product is in the `files` directory.
 
-## Customizing
-
-For now, directly edit the templates in the `templates` directory to include any
-additional content you'd like.
-
 ## Deployment
 
 *Don't run `app.py` in production.* The webserver it uses is not meant for such
