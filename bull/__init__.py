@@ -26,4 +26,4 @@ bcrypt = Bcrypt(app)
 login_manager.init_app(app)
 app.register_blueprint(bull)
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
