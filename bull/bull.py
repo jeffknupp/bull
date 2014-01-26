@@ -4,89 +4,73 @@ trivially easy.
 
 """
 
-import datetime
+import logging
 import sys
 import uuid
 
-from jinja2 import Environment, PackageLoader
-from flask import (Flask, send_from_directory, abort, redirect, request,
-                   render_template)
+from flask import (Blueprint, send_from_directory, abort, request,
+                   render_template, current_app, render_template, redirect,
+                   url_for)
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.login import LoginManager, login_required, login_user
 from flask.ext.mail import Mail, Message
+from flask_wtf import Form
+from wtforms import TextField, PasswordField
+from wtforms.validators import DataRequired
 import stripe
 
-from . import app
+from .models import Product, Purchase, User, db
 
-stripe.api_key = app.config['STRIPE_SECRET_KEY']
+logger = logging.getLogger(__name__)
+bull = Blueprint('bull', __name__)
+mail = Mail()
+login_manager = LoginManager()
 
-db = SQLAlchemy(app)
-mail = Mail(app)
-env = Environment(loader=PackageLoader('bull', 'templates'))
+class LoginForm(Form):
+    email = TextField('name', validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired()]) 
 
-class Product(db.Model):
-    """A digital product for sale on our site.
+@login_manager.user_loader
+def user_loader(user_id):
+    """Given *user_id*, return the associated User object.
 
-    :param int id: Unique id for this product
-    :param str name: Human-readable name of this product
-    :param str file_name: Path to file this digital product represents
-    :param str version: Optional version to track updates to products
-    :param bool is_active: Used to denote if a product should be considered
-                          for-sale
-    :param float price: Price of product
+    :param unicode user_id: user_id (email) user to retrieve
     """
-    __tablename__ = 'product'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String)
-    file_name = db.Column(db.String)
-    version = db.Column(db.String, default=None, nullable=True)
-    is_active = db.Column(db.Boolean, default=True, nullable=True)
-    price = db.Column(db.Float)
+    return User.query.get(user_id)
 
-    def __str__(self):
-        """Return the string representation of a product."""
-        return '{} (v{})'.format(self.name, self.version)
+@bull.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.get(form.email.data)
+        login_user(user, remember=True)
+        
+        return redirect(url_for("bull.reports"))
+    return render_template("login.html", form=form)
 
-class Purchase(db.Model):
-    """Contains information about the sale of a product.
+@bull.route('/<purchase_uuid>')
+def download_file(purchase_uuid):
+    """Serve the file associated with the purchase whose ID is *purchase_uuid*.
 
-    :param str uuid: Unique ID (and URL) generated for the customer unique to
-                     this purchase
-    :param str email: Customer's email address
-    :param int product_id: ID of the product associated with this sale
-    :param :class:`SQLAlchemy.relationship` product: The associated product
-    :param downloads_left int: Number of downloads remaining using this URL
-    """
-    __tablename__ = 'purchase'
-    uuid = db.Column(db.String, primary_key=True)
-    email = db.Column(db.String)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
-    product = db.relationship(Product)
-    downloads_left = db.Column(db.Integer, default=5)
-    sold_at = db.Column(db.DateTime, default=datetime.datetime.now)
-
-    def __str__(self):
-        """Return the string representation of the purchase."""
-        return '{} bought by {}'.format(self.product.name, self.email)
-
-@app.route('/<uuid>')
-def download_file(uuid):
-    """Serve the file associated with the purchase whose ID is *uuid*.
-
-    :param str uuid: Primary key of the purchase whose file we need to serve
+    :param str purchase_uuid: Primary key of the purchase whose file we need
+                              to serve
 
     """
-    purchase = Purchase.query.get(uuid)
+    purchase = Purchase.query.get(purchase_uuid)
     if purchase:
         purchase.downloads_left -= 1
         if purchase.downloads_left <= 0:
             return render_template('downloads_exceeded.html')
         db.session.commit()
-        return send_from_directory(directory=app.config['FILE_DIRECTORY'],
-                filename=purchase.product.file_name, as_attachment=True)
+        return send_from_directory(
+                directory=current_app.config['FILE_DIRECTORY'],
+                filename=purchase.product.file_name,
+                as_attachment=True)
     else:
         abort(404)
-    
-@app.route('/buy', methods=['POST'])
+
+
+@bull.route('/buy', methods=['POST'])
 def buy():
     """Facilitate the purchase of a product."""
 
@@ -101,10 +85,10 @@ def buy():
                 currency='usd',
                 card=stripe_token,
                 description=email)
-    except stripe.CardError, e:
+    except stripe.CardError:
         return render_template('charge_error.html')
 
-    app.logger.info(charge)
+    current_app.logger.info(charge)
 
     purchase = Purchase(uuid=str(uuid.uuid4()),
             email=email,
@@ -112,29 +96,52 @@ def buy():
     db.session.add(purchase)
     db.session.commit()
 
-    mail_template = env.get_template('email.html')
-    mail_html = mail_template.render(purchase=purchase, product=product)
+    mail_html = render_template(
+            'email.html',
+            url=purchase.uuid,
+            )
 
     message = Message(
             html=mail_html,
-            subject=app.config['MAIL_SUBJECT'],
-            sender=app.config['MAIL_FROM'],
+            subject=current_app.config['MAIL_SUBJECT'],
+            sender=current_app.config['MAIL_FROM'],
             recipients=[email])
 
     with mail.connect() as conn:
         conn.send(message)
 
-    return render_template('success.html', url=purchase.uuid)
+    return render_template('success.html', url=str(purchase.uuid))
 
-@app.route('/test/<product_id>')
+@bull.route('/reports')
+@login_required
+def reports():
+    """Run and display various analytics reports."""
+    products = Product.query.all()
+    purchases = Purchase.query.all()
+    purchases_by_day = dict()
+    for purchase in purchases:
+        purchase_date = purchase.sold_at.date().strftime('%m-%d')
+        if purchase_date not in purchases_by_day:
+            purchases_by_day[purchase_date] = {'units': 0, 'sales': 0.0}
+        purchases_by_day[purchase_date]['units'] += 1
+        purchases_by_day[purchase_date]['sales'] += purchase.product.price
+    purchase_days = sorted(purchases_by_day.keys())
+    units = len(purchases)
+    total_sales = sum([p.product.price for p in purchases])
+
+    return render_template(
+            'reports.html',
+            products=products,
+            purchase_days=purchase_days,
+            purchases=purchases,
+            purchases_by_day=purchases_by_day,
+            units=units,
+            total_sales=total_sales)
+
+@bull.route('/test/<product_id>')
 def test(product_id):
     """Return a test page for live testing the "purchase" button."""
     test_product = Product.query.get(product_id)
     return render_template(
-            'test.html', 
-            test_product=test_product, 
-            stripe_key=app.config['STRIPE_PUBLIC_KEY'],
-            site_name=app.config['SITE_NAME'])
-
-if __name__ == '__main__':
-    sys.exit(app.run(debug=True))
+            'test.html',
+            test_product=test_product)

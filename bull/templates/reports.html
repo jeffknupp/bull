@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.table-wrapper {
+    height: 300px !important;
+    overflow: auto;
+}
+</style>
+ <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      function drawSalesChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Day', 'Units Sold'],
+          {% for day in purchase_days %}
+          ['{{ day }}', {{ purchases_by_day[day].sales }} ],
+          {% endfor %}
+        ]);
+
+        var options = {
+          title: 'Sales Performance By Day',
+          vAxis: {title: 'Day',  titleTextStyle: {color: 'red'}}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('sales_chart'));
+        chart.draw(data, options);
+      }
+    google.setOnLoadCallback(drawSalesChart);
+      function drawUnitsChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Day', 'Units Sold'],
+          {% for day in purchase_days %}
+          ['{{day}}', {{ purchases_by_day[day].units }} ],
+          {% endfor %}
+        ]);
+
+        var options = {
+          title: 'Sales Performance By Day',
+          vAxis: {title: 'Day',  titleTextStyle: {color: 'red'}}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('units_chart'));
+        chart.draw(data, options);
+      }
+    google.setOnLoadCallback(drawUnitsChart);
+    </script>
+    <div class="container" style="padding-top: 40px; padding-bottom: 40px;">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="table-wrapper">
+                <table id="email" class="table-condensed table-bordered">
+                    <thead>
+                        <th width="20%">Email</th>
+                        <th width="20%">Sale Amount</th>
+                    </thead>
+                    <tbody>
+                    {% for purchase in purchases %}
+                    <tr>
+                        <td>{{ purchase.email }}</td>
+                        <td>{{ purchase.product.price }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <th>Sales</th>
+                            <th>Units Sold</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>${{ total_sales }}</td>
+                            <td>{{ units }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <th>Date</th>
+                        <th>Units Sold</th>
+                    </thead>
+                    <tbody>
+                        {% for day in purchase_days %}
+                    <tr>
+                        <td>{{day}}</td>
+                        <td>{{ purchases_by_day[day].units }}</td> 
+                    </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div id="sales_chart" >
+            </div>
+            <div id="units_chart" >
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

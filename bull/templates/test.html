@@ -3,9 +3,9 @@
         <form action="/buy" method="POST">
             <script
                 src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                data-key="{{ stripe_key }}"
+                data-key="{{ config.STRIPE_PUBLIC_KEY }}"
                 data-amount="{{ test_product.price * 100 }}"
-                data-name="{{ site_name }}"
+                data-name="{{ config.SITE_ADDRESS }}"
                 data-description="{{ test_product.name }} (${{ test_product.price }})">
             </script>
             <input type="hidden" name="product_id" value="{{ test_product.id }}" />
