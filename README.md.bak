@@ -1,7 +1,7 @@
 # `bull` always charges...
 
-[![Build Status](https://travis-ci.org/jeffknupp/bull.png?branch=develop)](https://travis-ci.org/jeffknupp/bull)
-[![Coverage Status](https://coveralls.io/repos/jeffknupp/bull/badge.png?branch=develop)](https://coveralls.io/r/jeffknupp/bull?branch=develop)
+[![Build Status](https://travis-ci.org/jeffknupp/sandman.png?branch=develop)](https://travis-ci.org/jeffknupp/sandman)
+[![Coverage Status](https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop)](https://coveralls.io/r/jeffknupp/sandman?branch=develop)
 
 ## WTF is `bull`?
 
@@ -41,7 +41,7 @@ and a web server (free?).
 1. Grab the file `config.py` either from the repo or the installation and enter
 your own values
 1. Create a directory named `files` and put your products' files in there
-1. Add product entries to the database (use `scripts/populate_db` as a model)
+1. Add product entries to the database (use `scripts/populdate_db` as a model)
 1. (Optional) Create an admin user for viewing `/reports` by running `scripts/create_user.py`
 1. Add `bull` to your web server's configuration 
 1. Profit! (...literally)

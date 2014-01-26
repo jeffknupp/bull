@@ -105,7 +105,7 @@ information. All of this is coming. I just wanted to get ``bull`` out as
 fast as possible so that those who know what they're doing can make use
 of it.
 
-.. |Build Status| image:: https://travis-ci.org/jeffknupp/sandman.png?branch=develop
-   :target: https://travis-ci.org/jeffknupp/sandman
-.. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman/badge.png?branch=develop
-   :target: https://coveralls.io/r/jeffknupp/sandman?branch=develop
+.. |Build Status| image:: https://travis-ci.org/jeffknupp/bull.png?branch=develop
+   :target: https://travis-ci.org/jeffknupp/bull
+.. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/bull/badge.png?branch=develop
+   :target: https://coveralls.io/r/jeffknupp/bull?branch=develop
