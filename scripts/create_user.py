@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+"""Create a new admin user able to view the /reports endpoint."""
 from getpass import getpass
 import sys
 

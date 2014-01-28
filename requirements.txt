@@ -8,3 +8,5 @@ Flask-WTF==0.9.4
 Flask-Bcrypt==0.5.2
 Flask-Login==0.2.9
 pytest-cov==1.6
+sphinxcontrib-httpdomain==1.2.0
+Sphinx==1.2.1
