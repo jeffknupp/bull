@@ -85,9 +85,10 @@ def buy():
     product_id = request.form['product_id']
 
     product = Product.query.get(product_id)
+    amount = int(product.price * 100)
     try:
         charge = stripe.Charge.create(
-                amount=int(product.price * 100),
+                amount=amount,
                 currency='usd',
                 card=stripe_token,
                 description=email)
@@ -116,7 +117,8 @@ def buy():
     with mail.connect() as conn:
         conn.send(message)
 
-    return render_template('success.html', url=str(purchase.uuid), purchase=purchase, product=product)
+    return render_template('success.html', url=str(purchase.uuid), purchase=purchase, product=product,
+            amount=amount)
 
 @bull.route('/reports')
 @login_required
