@@ -27,7 +27,9 @@ class Product(db.Model):
 
     def __str__(self):
         """Return the string representation of a product."""
-        return '{} (v{})'.format(self.name, self.version)
+        if self.version is not None:
+            return '{} (v{})'.format(self.name, self.version)
+        return self.name
 
 class Purchase(db.Model):
     """Contains information about the sale of a product.
@@ -48,7 +50,7 @@ class Purchase(db.Model):
     sold_at = db.Column(db.DateTime, default=datetime.datetime.now)
 
     def sell_date(self):
-        return self.sold_at.date
+        return self.sold_at.date()
 
     def __str__(self):
         """Return the string representation of the purchase."""
@@ -62,22 +64,19 @@ class User(db.Model):
     """
     __tablename__ = 'user'
 
-    def __init__(self, email, password):
-        self.email = email
-        self.password = password
-        self.is_authenticated = False
+    def __init__(self, *args, **kwargs):
+        super(User, self).__init__(*args, **kwargs)
+        self._authenticated = False
 
     email = db.Column(db.String, primary_key=True)
     password = db.Column(db.String)
 
-    def is_authenticated(self):
-        return self.is_authenticated
-    
     def is_active(self):
         return True
 
-    def is_anonymous(self):
-        return False
-
     def get_id(self):
+        """Return the email address to satify Flask-Login's requirements."""
         return self.email
+
+    def is_authenticated(self):
+        return self._authenticated

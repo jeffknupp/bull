@@ -1,10 +1,12 @@
 """Tests for the Bull digital goods sales application."""
 
+import datetime
 import unittest
 import uuid
 import os
 
 from flask import current_app
+from flask.ext.login import LoginManager, login_required, login_user
 
 from bull import app, mail, bcrypt
 from bull.models import db, User, Product, Purchase
@@ -19,6 +21,7 @@ class BullTestCase(unittest.TestCase):
         app.config['SITE_NAME'] = 'www.foo.com'
         app.config['STRIPE_SECRET_KEY'] = 'foo'
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.config['WTF_CSRF_ENABLED'] = False
         app.config['FILE_DIRECTORY'] = os.path.abspath(os.path.join(os.path.split(os.path.abspath(__file__))[0], 'files'))
         with app.app_context():
             db.init_app(current_app)
@@ -34,7 +37,8 @@ class BullTestCase(unittest.TestCase):
                 price=5.01)
             purchase = Purchase(product=product,
                     email='foo@bar.com',
-                    uuid=self.purchase_uuid)
+                    uuid=self.purchase_uuid,
+                    sold_at=datetime.datetime(2014, 1, 1, 12, 12, 12))
             user = User(email='admin@foo.com',
                     password=bcrypt.generate_password_hash('password'))
             db.session.add(product)
@@ -77,3 +81,49 @@ class BullTestCase(unittest.TestCase):
         response = self.app.get(purchase_url)
         assert response.data == 'Test content\n'
         assert response.status_code == 200
+
+    def test_product_no_version_as_string(self):
+        """Is the string representation of the Product model what we expect?"""
+        with app.app_context():
+            product = Product.query.get(1)
+            assert str(product) == 'Test Product'
+
+    def test_product_with_version_as_string(self):
+        """Is the string representation of the Product model what we expect?"""
+        with app.app_context():
+            product = Product.query.get(1)
+            product.version = '1.0'
+            assert str(product) == 'Test Product (v1.0)'
+
+    def test_get_purchase_date(self):
+        """Can we retrieve the date of the Purchase instance created in setUp?"""
+        with app.app_context():
+            purchase = Purchase.query.get(self.purchase_uuid)
+            assert purchase.sell_date() == datetime.datetime(2014, 1, 1).date()
+
+    def test_get_purchase_string(self):
+        """Is the string representation of the Purchase model what we expect?"""
+        with app.app_context():
+            purchase = Purchase.query.get(self.purchase_uuid)
+            assert str(purchase) == 'Test Product bought by foo@bar.com'
+
+    def login(self, username, password):
+        """Login user."""
+        return self.app.post(
+                '/login', 
+                data={'email': username, 'password': password},
+                follow_redirects=True
+                )
+
+    def test_user_authentication(self):
+        """Do the authencation methods for the User model work as expected?"""
+        with app.app_context():
+            user = User.query.get('admin@foo.com')
+            response = self.app.get('/reports')
+            assert response.status_code == 401
+            assert self.login(user.email, 'password').status_code == 200
+            response = self.app.get('/reports')
+            assert response.status_code == 200
+            assert 'drawSalesChart' in response.data
+
+    

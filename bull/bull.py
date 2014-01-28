@@ -11,6 +11,7 @@ import uuid
 from flask import (Blueprint, send_from_directory, abort, request,
                    render_template, current_app, render_template, redirect,
                    url_for)
+from flaskext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager, login_required, login_user
 from flask.ext.mail import Mail, Message
@@ -25,9 +26,10 @@ logger = logging.getLogger(__name__)
 bull = Blueprint('bull', __name__)
 mail = Mail()
 login_manager = LoginManager()
+bcrypt = Bcrypt()
 
 class LoginForm(Form):
-    email = TextField('name', validators=[DataRequired()])
+    email = TextField('email', validators=[DataRequired()])
     password = PasswordField('password', validators=[DataRequired()]) 
 
 @login_manager.user_loader
@@ -40,12 +42,16 @@ def user_loader(user_id):
 
 @bull.route("/login", methods=["GET", "POST"])
 def login():
+    'logging in'
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.get(form.email.data)
-        login_user(user, remember=True)
-        
-        return redirect(url_for("bull.reports"))
+        if user:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                'logging in successfully'
+                user._authenticated = True
+                login_user(user, remember=True)
+                return redirect(url_for("bull.reports"))
     return render_template("login.html", form=form)
 
 @bull.route('/<purchase_uuid>')

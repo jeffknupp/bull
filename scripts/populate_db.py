@@ -2,7 +2,7 @@ import uuid
 
 from bull import app
 app.config['STRIPE_SECRET_KEY'] = None
-from bull.bull import Product, Purchase, db
+from bull.models import Product, Purchase, db
 
 pdf2 = Product(
     id=1,
@@ -50,12 +50,13 @@ purchase = Purchase(
     product_id=pdf3.id,
     )
 
-session = db.session()
-db.metadata.create_all(db.engine)
-session.add(pdf2)
-session.add(pdf3)
-session.add(epub3)
-session.add(epub3)
-session.add(bundle)
-session.add(purchase)
-session.commit()
+with app.app_context():
+    session = db.session()
+    db.metadata.create_all(db.engine)
+    session.add(pdf2)
+    session.add(pdf3)
+    session.add(epub2)
+    session.add(epub3)
+    session.add(bundle)
+    session.add(purchase)
+    session.commit()
