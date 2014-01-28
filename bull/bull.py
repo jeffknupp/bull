@@ -116,7 +116,7 @@ def buy():
     with mail.connect() as conn:
         conn.send(message)
 
-    return render_template('success.html', url=str(purchase.uuid))
+    return render_template('success.html', url=str(purchase.uuid), purchase=purchase, product=product)
 
 @bull.route('/reports')
 @login_required

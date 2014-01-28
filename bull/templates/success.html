@@ -1,4 +1,32 @@
 <html>
+    <head>
+   <script>
+       (function(i,s,o,g,r,a,m){{i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){{
+                       (i[r].q=i[r].q||[]).push(arguments)}},i[r].l=1*new Date();a=s.createElement(o),
+               m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+       }})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+       ga('create', 'UA-12615441-1', 'jeffknupp.com');
+       ga('require', 'ecommerce', 'ecommerce.js');
+       ga('ecommerce:addTransaction', {{
+               'id': '{purchase.uuid}',                     // Transaction ID. Required.
+               'affiliation': 'Writing Idiomatic Python',   // Affiliation or store name.
+               'revenue': '{product.price}',               // Grand Total.
+               'shipping': '0',                  // Shipping.
+               'tax': '0'                     // Tax.
+       }});
+       ga('ecommerce:addItem', {{
+               'id': '{purchase.uuid}',                     // Transaction ID. Required.
+               'name': '{product.name}',    // Product name. Required.
+               'sku': '{product.id}',                 // SKU/code.
+               'price': '{product.price}',                 // Unit price.
+               'quantity': '1'                   // Quantity.
+       }});
+       ga('ecommerce:send');
+       ga('send', 'event', 'purchase', 'buy', '{product.name}', {amount});
+       ga('send', 'pageview');
+
+  </script>
     <body>
         <h1>Thanks for your purchase!</h1>
         <p>The following link is unique to your purchase. Use it to download your item (up to five times).</p> 
