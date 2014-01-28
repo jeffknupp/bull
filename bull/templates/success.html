@@ -1,5 +1,5 @@
-<html>
-    <head>
+{% extends "base.html" %}
+{% block extra_head %}
    <script>
        (function(i,s,o,g,r,a,m){{i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){{
                        (i[r].q=i[r].q||[]).push(arguments)}},i[r].l=1*new Date();a=s.createElement(o),
@@ -27,9 +27,11 @@
        ga('send', 'pageview');
 
   </script>
-    <body>
+{% endblock extra_head %}
+{% block content %}
+    <div class="container">
         <h1>Thanks for your purchase!</h1>
         <p>The following link is unique to your purchase. Use it to download your item (up to five times).</p> 
         <p>Your unique link: <a href="{{ url }}">{{ url }}</a></p>
-    </body>
-</html>
+    </div>
+{% endblock content %}

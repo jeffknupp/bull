@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<form method="POST" action="/login">
-    {{ form.csrf_token }}
-    {{ form.email.label }} {{ form.email(size=20) }}
-    {{ form.password.label }} {{ form.password(size=20) }}
-    <input type="submit" value="Login">
-</form>
+<div class="container">
+    <form method="POST" action="/login">
+        {{ form.csrf_token }}
+        {{ form.email.label }} {{ form.email(size=20) }}
+        {{ form.password.label }} {{ form.password(size=20) }}
+        <input type="submit" value="Login">
+    </form>
+</div>
 {% endblock %}

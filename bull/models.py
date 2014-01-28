@@ -70,6 +70,7 @@ class User(db.Model):
 
     email = db.Column(db.String, primary_key=True)
     password = db.Column(db.String)
+    authenticated = db.Column(db.Boolean, default=False)
 
     def is_active(self):
         return True
@@ -79,4 +80,4 @@ class User(db.Model):
         return self.email
 
     def is_authenticated(self):
-        return self._authenticated
+        return self.authenticated
