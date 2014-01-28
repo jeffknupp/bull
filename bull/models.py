@@ -13,8 +13,7 @@ class Product(db.Model):
     :param str name: Human-readable name of this product
     :param str file_name: Path to file this digital product represents
     :param str version: Optional version to track updates to products
-    :param bool is_active: Used to denote if a product should be considered
-                          for-sale
+    :param bool is_active: Used to denote if a product should be considered for-sale
     :param float price: Price of product
     """
     __tablename__ = 'product'
@@ -34,8 +33,7 @@ class Product(db.Model):
 class Purchase(db.Model):
     """Contains information about the sale of a product.
 
-    :param str uuid: Unique ID (and URL) generated for the customer unique to
-                     this purchase
+    :param str uuid: Unique ID (and URL) generated for the customer unique to this purchase
     :param str email: Customer's email address
     :param int product_id: ID of the product associated with this sale
     :param :class:`SQLAlchemy.relationship` product: The associated product
