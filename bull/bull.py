@@ -13,7 +13,7 @@ from flask import (Blueprint, send_from_directory, abort, request,
                    url_for)
 from flaskext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager, login_required, login_user
+from flask.ext.login import LoginManager, login_required, login_user, current_user
 from flask.ext.mail import Mail, Message
 from flask_wtf import Form
 from wtforms import TextField, PasswordField
@@ -57,6 +57,7 @@ def login():
 @bull.route("/logout", methods=["GET"])
 @login_required
 def logout():
+    user = current_user
     user.authenticated = False
     db.session.add(user)
     db.session.commit()
