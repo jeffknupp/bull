@@ -15,6 +15,7 @@ class Product(db.Model):
     :param str version: Optional version to track updates to products
     :param bool is_active: Used to denote if a product should be considered for-sale
     :param float price: Price of product
+
     """
     __tablename__ = 'product'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -36,8 +37,9 @@ class Purchase(db.Model):
     :param str uuid: Unique ID (and URL) generated for the customer unique to this purchase
     :param str email: Customer's email address
     :param int product_id: ID of the product associated with this sale
-    :param :class:`SQLAlchemy.relationship` product: The associated product
+    :param product: The associated product
     :param downloads_left int: Number of downloads remaining using this URL
+
     """
     __tablename__ = 'purchase'
     uuid = db.Column(db.String, primary_key=True)
@@ -59,6 +61,7 @@ class User(db.Model):
 
     :param str email: email address of user
     :param str password: encrypted password for the user
+
     """
     __tablename__ = 'user'
 

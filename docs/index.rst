@@ -13,7 +13,7 @@ Contents:
 
    quickstart
 
-.. autoflask:: app:get_app()
+.. autoflask:: bull:app
    :undoc-static:
 
 Indices and tables
