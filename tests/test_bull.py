@@ -125,5 +125,7 @@ class BullTestCase(unittest.TestCase):
             response = self.app.get('/reports')
             assert response.status_code == 200
             assert 'drawSalesChart' in response.data
-
-    
+            response = self.app.get('/logout')
+            assert response.status_code == 200
+            response = self.app.get('/reports')
+            assert response.status_code == 401

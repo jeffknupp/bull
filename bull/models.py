@@ -81,3 +81,6 @@ class User(db.Model):
 
     def is_authenticated(self):
         return self.authenticated
+
+    def is_anonymous(self):
+        return False

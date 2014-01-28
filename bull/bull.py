@@ -13,7 +13,7 @@ from flask import (Blueprint, send_from_directory, abort, request,
                    url_for)
 from flaskext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager, login_required, login_user, current_user
+from flask.ext.login import LoginManager, login_required, login_user, logout_user, current_user
 from flask.ext.mail import Mail, Message
 from flask_wtf import Form
 from wtforms import TextField, PasswordField
@@ -62,7 +62,7 @@ def logout():
     db.session.add(user)
     db.session.commit()
     logout_user()
-    return render_template("logout.html", form=form)
+    return render_template("logout.html")
 
 
 @bull.route('/<purchase_uuid>')
