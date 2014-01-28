@@ -61,7 +61,7 @@ def logout():
     user.authenticated = False
     db.session.add(user)
     db.session.commit()
-    logout_user(user, remember=True)
+    logout_user()
     return render_template("logout.html", form=form)
 
 
