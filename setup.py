@@ -56,6 +56,7 @@ setup(
     author_email='jeff@jeffknupp.com',
     description='Digital goods payment processing made simple',
     long_description=long_description,
+    scripts=['scripts/bull'],
     packages=['bull'],
     package_dir={'bull': 'bull'},
     package_data={'bull': ['templates/*.html']},
