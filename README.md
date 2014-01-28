@@ -22,38 +22,35 @@ and a web server (free?).
 
 ## Installation
 
-1. `pip install bull` 
-1. Create a file named `app.py` with the following contents: 
-
-~~~~{.py}
-    from bull import app, db
-    def get_app():
-        """Return the application object."""
-        return app
-
-    if __name__ == '__main__':
-        app.config.from_object('config')
-        with app.app_context():
-            db.metadata.create_all(bind=db.engine)
-        get_app().run(debug=True)
-~~~~
-
-1. Grab the file `config.py` either from the repo or the installation and enter
-your own values
-1. Create a directory named `files` and put your products' files in there
-1. Add product entries to the database (use `scripts/populate_db` as a model)
-1. (Optional) Create an admin user for viewing `/reports` by running `scripts/create_user.py`
-1. Add `bull` to your web server's configuration 
-1. Profit! (...literally)
+1. `pip install bull`. This installs the `bull` command, which helps
+   setup your environment
+2. `bull setup`. This creates a directory named `bull` with the
+   following contents:
+   *  `app.py`: the main application script. `get_app` can be used
+      to run `bull` as a WSGI application
+   *  `config.py`: `bull`'s configuration file. This must be edited
+      to contain your installation-specific configuration details.
+   *  `files` directory: The directory that contains the files for
+      your digital products
+3. Add product entries to the database (use `scripts/populate_db` as a
+   model)
+4. (Optional) Create an admin user for viewing `/reports` by running
+   `scripts/create_user.py`
+5. Add `bull` to your web server's configuration
+6. Profit! (...literally)
 
 ## Analytics and Login
 
-`bull` now supports simple sales analytics at the `/reports` endpoint. It
-requires authorization, which in turn requires you to create (one) user using
-the `scripts/create_user.py` script. To see the reports, hit `/login`, log
-in, and from then on you can go directly to `/reports` to see reporting data. 
-You should be good to go after that, and no one else will be able to see the
-reports.
+`bull` supports simple sales analytics at the `/reports` endpoint.
+It requires authorization, which in turn requires you to create (at
+least one) user using the `scripts/create_user.py` script. To see the
+reports, hit `/login`, log in, and from then on you can go directly to
+`/reports` to see reporting data. You should be good to go after that,
+and no one else will be able to see the reports.
+
+If for some reason you need to logout, there is also a `/logout`
+endpoint which will log you out (which should use HTTP POST instead of
+GET, but whatever).
 
 **Reporting includes:**
 
