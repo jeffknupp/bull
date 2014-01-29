@@ -86,3 +86,5 @@ a purpose. Instead, deploy as you would normally deploy an WSGI application. See
 Still need to add better documentation and (possibly) deployment information.
 All of this is coming. I just wanted to get `bull` out as fast as possible 
 so that those who know what they're doing can make use of it.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/jeffknupp/bull/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

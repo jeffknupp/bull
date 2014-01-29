@@ -101,7 +101,11 @@ information. All of this is coming. I just wanted to get ``bull`` out as
 fast as possible so that those who know what they're doing can make use
 of it.
 
+|Bitdeli Badge|
+
 .. |Build Status| image:: https://travis-ci.org/jeffknupp/bull.png?branch=develop
    :target: https://travis-ci.org/jeffknupp/bull
 .. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/bull/badge.png?branch=develop
    :target: https://coveralls.io/r/jeffknupp/bull?branch=develop
+.. |Bitdeli Badge| image:: https://d2weczhvl823v0.cloudfront.net/jeffknupp/bull/trend.png
+   :target: https://bitdeli.com/free
