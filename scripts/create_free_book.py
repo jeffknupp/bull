@@ -19,6 +19,7 @@ with app.app_context():
         )
     session.add(purchase)
     session.commit()
+    print 'link is https://buy.jeffknupp.com/{}'.format(purchase.uuid)
 
 #with app.app_context():
 #    session = db.session()
