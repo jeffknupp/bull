@@ -9,28 +9,21 @@ import uuid
 
 from flask import (Blueprint, send_from_directory, abort, request,
                    render_template, current_app, render_template, redirect,
-                   url_for)
+                   url_for, current_app)
 from flaskext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager, login_required, login_user, logout_user, current_user
 from flask.ext.mail import Mail, Message
-from flask_wtf import Form
-from wtforms import TextField, PasswordField
-from wtforms.validators import DataRequired
 import stripe
 
 from .models import Product, Purchase, User, db
+from .forms import FreeBookForm, LoginForm
 
 logger = logging.getLogger(__name__)
 bull = Blueprint('bull', __name__)
 mail = Mail()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
-
-class LoginForm(Form):
-    """Form class for user login."""
-    email = TextField('email', validators=[DataRequired()])
-    password = PasswordField('password', validators=[DataRequired()]) 
 
 @login_manager.user_loader
 def user_loader(user_id):
@@ -44,6 +37,7 @@ def user_loader(user_id):
 def login():
     """For GET requests, display the login form. For POSTS, login the current user
     by processing the form."""
+    print db
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.get(form.email.data)
@@ -170,3 +164,39 @@ def test(product_id):
     return render_template(
             'test.html',
             test_product=test_product)
+
+@bull.route('/free', methods=['GET', 'POST'])
+@login_required
+def free_book_link():
+    if request.method == 'POST':
+        email = request.form['email']
+        product = request.form['product']
+        book = db.session.query(Product).get(product)
+        purchase = Purchase(
+            uuid=str(uuid.uuid4()),
+            email=email,
+            product_id=book.id
+            )
+        db.session.add(purchase)
+        db.session.commit()
+
+        mail_html = render_template(
+                'free_email.html',
+                url=purchase.uuid,
+                )
+
+        message = Message(
+                html=mail_html,
+                subject=current_app.config['MAIL_SUBJECT'],
+                sender=current_app.config['MAIL_FROM'],
+                recipients=[email])
+
+        with mail.connect() as conn:
+            conn.send(message)
+
+        return """<HTML><BODY><H1>Mail sent to {}</H1></BODY></HTML>""".format(email)
+
+    else:
+        form = FreeBookForm()
+        form.product.choices=[(e.id, e.name) for e in db.session.query(Product).all()]
+        return render_template('free.html', form=form)

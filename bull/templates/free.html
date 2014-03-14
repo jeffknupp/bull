@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form role="form" method="post" action="/free">
+    {{ form.csrf_token }}
+    {{ form.email.label }} {{ form.email(size=20) }}
+    {{ form.product.label }} {{ form.product }}
+    <button type="submit" class="btn btn-success">Generate Link</button>
+</form>
+{% endblock content %}
