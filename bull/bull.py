@@ -10,7 +10,7 @@ import uuid
 from flask import (Blueprint, send_from_directory, abort, request,
                    render_template, current_app, render_template, redirect,
                    url_for, current_app)
-from flaskext.bcrypt import Bcrypt
+from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager, login_required, login_user, logout_user, current_user
 from flask.ext.mail import Mail, Message
