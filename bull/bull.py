@@ -136,7 +136,7 @@ def reports():
     purchases = Purchase.query.all()
     purchases_by_day = dict()
     for purchase in purchases:
-        purchase_date = purchase.sold_at.date().strftime('%m-%d')
+        purchase_date = purchase.sold_at.date().strftime('%y-%m-%d')
         if purchase_date not in purchases_by_day:
             purchases_by_day[purchase_date] = {'units': 0, 'sales': 0.0}
         purchases_by_day[purchase_date]['units'] += 1
@@ -157,7 +157,7 @@ def reports():
 @bull.route('/test/<product_id>')
 def test(product_id):
     """Return a test page for live testing the "purchase" button.
-    
+
     :param int product_id: id (primary key) of product to test.
     """
     test_product = Product.query.get(product_id)
